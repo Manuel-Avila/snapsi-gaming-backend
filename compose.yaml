@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  api:
+    depends_on:
+      - db
+    build: .
+    ports: 
+      - 3000:3000
+    env_file:
+      - .env
+    develop:
+      watch:
+        - path: ./package.json
+          action: rebuild
+        - path: ./package-lock.json
+          action: rebuild
+        - path: .
+          target: /app
+          action: sync
+  db:
+    image: mysql:latest
+    environment:
+     - MYSQL_ROOT_PASSWORD=secret
+     - MYSQL_DATABASE=snapsi
+    ports:
+      - 3306:3306
+    volumes:
+      - snapsi:/var/lib/mysql
+
+volumes:
+  snapsi:

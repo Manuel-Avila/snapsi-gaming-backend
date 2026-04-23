@@ -1,0 +1,18 @@
+# Node modules (installed packages)
+node_modules/
+
+# Environment variables (keep secrets out of version control)
+.env
+
+# Log files
+*.log
+logs/
+
+# Temporary folders
+temp/
+tmp/
+
+# Editor/IDE configurations
+.vscode/
+.idea/
+.DS_Store
