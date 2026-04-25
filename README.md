@@ -1,3 +1,9 @@
 # Snapsi Backend
 
-## By: Manuel Alejandro Avila Moreno
+### Developed by
+
+- Manuel Avila
+- Melissa Castillo
+- Ehileen Rocha
+- Roberto Vega
+- Omar Antonio
