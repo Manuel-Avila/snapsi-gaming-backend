@@ -1,0 +1,16 @@
+@baseUrl = http://localhost:3000/api
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0MSIsImlhdCI6MTc3OTYwMTk4NSwiZXhwIjoxNzgxMzI5OTg1fQ.52vn0pQtw7KiuHsS1Tiwuv0-_6ByQajv_75gHEycp0k
+@postId = 1
+
+# Get all posts
+GET {{baseUrl}}/posts
+Authorization: Bearer {{token}}
+
+# Add comment to a post
+POST {{baseUrl}}/posts/{{postId}}/comments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+	"comment_text": "Test from rest client!"
+}
