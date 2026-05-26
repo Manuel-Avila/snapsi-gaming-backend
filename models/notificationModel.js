@@ -68,3 +68,34 @@ export const createNotification = async (notification) => {
 
   return result.insertId;
 };
+
+export const getNotificationById = async (notificationId) => {
+  const baseQuery = `
+    SELECT 
+        n.id, n.type, n.created_at, n.recipient_user_id,
+        JSON_OBJECT(
+            'id', u.id,
+            'username', u.username,
+            'profile_picture_url', u.profile_picture_url
+        ) AS sender,
+        CASE 
+            WHEN n.post_id IS NOT NULL THEN
+                JSON_OBJECT(
+                    'id', p.id,
+                    'image_url', p.image_url
+                )
+            ELSE NULL
+        END AS post
+    FROM 
+        notifications n
+    JOIN
+        users u ON n.sender_user_id = u.id
+    LEFT JOIN 
+        posts p ON n.post_id = p.id
+    WHERE 
+        n.id = ?
+  `;
+
+  const [rows] = await db.query(baseQuery, [notificationId]);
+  return rows[0];
+};

@@ -5,6 +5,7 @@ export const createPostSchema = Joi.object({
     "string.max": `"caption" must be at most 500 characters long`,
   }),
   tags: Joi.string().allow("").optional(),
+  local_id: Joi.string().allow("").optional(),
 });
 
 export const getPostsSchema = Joi.object({

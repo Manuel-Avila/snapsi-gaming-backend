@@ -17,6 +17,21 @@ export const createReview = async (review) => {
   return result.insertId || result.affectedRows;
 };
 
+export const getReviewByUserAndGame = async (user_id, game_id) => {
+  const [rows] = await db.query(
+    `SELECT
+      gr.id, gr.game_id, gr.game_name, gr.game_image, gr.rating, gr.description, gr.created_at,
+      JSON_OBJECT(
+        'id', u.id, 'name', u.name, 'username', u.username, 'profile_picture_url', u.profile_picture_url
+      ) AS user
+    FROM game_reviews gr
+    JOIN users u ON gr.user_id = u.id
+    WHERE gr.user_id = ? AND gr.game_id = ?`,
+    [user_id, game_id]
+  );
+  return rows[0];
+};
+
 export const getUserReviews = async (username, limit, cursor) => {
   let baseQuery = `
     SELECT

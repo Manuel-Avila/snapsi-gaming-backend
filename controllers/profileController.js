@@ -56,13 +56,17 @@ export const updateProfile = async (req, res) => {
       await deleteFile(currentUser.image_cloudinary_id);
     }
 
+    const newProfileData = {
+      name,
+      bio,
+      profile_picture_url,
+    };
+
+    req.app.get("io").emit("profile_updated", { userId, updatedData: newProfileData });
+
     res.status(200).json({
       message: "Profile updated successfully",
-      updatedData: {
-        name,
-        bio,
-        profile_picture_url,
-      },
+      updatedData: newProfileData,
     });
   } catch (error) {
     if (image_cloudinary_id) {

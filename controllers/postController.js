@@ -56,7 +56,7 @@ export const getPostById = async (req, res) => {
 };
 
 export const createPost = async (req, res) => {
-  const { caption, tags } = req.body;
+  const { caption, tags, local_id } = req.body;
   const imageFile = req.file;
   const { id: userId } = req.user;
 
@@ -94,6 +94,8 @@ export const createPost = async (req, res) => {
     if (!newPost) {
       throw new Error("Failed to retrieve the newly created post.");
     }
+
+    req.app.get("io").emit("new_post", { ...newPost, local_id });
 
     res.status(201).json({
       message: "Post created successfully",
@@ -134,6 +136,8 @@ export const deletePost = async (req, res) => {
     await deleteFile(post.image_cloudinary_id);
     await PostModel.deletePost(postId, userId);
 
+    req.app.get("io").emit("delete_post", { postId: Number(postId) });
+
     res.status(200).json({ message: "Post deleted successfully." });
   } catch (error) {
     console.error("Error deleting post:", error);
@@ -156,13 +160,19 @@ export const likePost = async (req, res) => {
     const result = await PostModel.addLike(postId, userId);
 
     if (recipient_user_id !== userId) {
-      await NotificationModel.createNotification({
+      const notifId = await NotificationModel.createNotification({
         type: "like",
         sender_user_id: userId,
         recipient_user_id,
         post_id: postId,
       });
+      const newNotif = await NotificationModel.getNotificationById(notifId);
+      if (newNotif) {
+        req.app.get("io").to(`user_${recipient_user_id}`).emit("new_notification", newNotif);
+      }
     }
+
+    req.app.get("io").emit("like_post", { postId: Number(postId), userId });
 
     res.status(201).json({ message: "Post liked successfully" });
   } catch (error) {
@@ -184,6 +194,8 @@ export const unlikePost = async (req, res) => {
     if (!result) {
       return res.status(200).json({ message: "Post was not liked" });
     }
+
+    req.app.get("io").emit("unlike_post", { postId: Number(postId), userId });
 
     res.status(200).json({ message: "Post unliked successfully" });
   } catch (error) {
@@ -241,7 +253,7 @@ export const getComments = async (req, res) => {
 
 export const addComment = async (req, res) => {
   const { postId } = req.params;
-  const { comment_text } = req.body;
+  const { comment_text, local_id } = req.body;
   const { id: userId } = req.user;
 
   try {
@@ -265,13 +277,19 @@ export const addComment = async (req, res) => {
     }
 
     if (recipient_user_id !== userId) {
-      await NotificationModel.createNotification({
+      const notifId = await NotificationModel.createNotification({
         type: "comment",
         sender_user_id: userId,
         recipient_user_id,
         post_id: postId,
       });
+      const newNotif = await NotificationModel.getNotificationById(notifId);
+      if (newNotif) {
+        req.app.get("io").to(`user_${recipient_user_id}`).emit("new_notification", newNotif);
+      }
     }
+
+    req.app.get("io").emit("new_comment", { postId: Number(postId), comment: newComment, local_id });
 
     res.status(201).json({
       message: "Comment added successfully",

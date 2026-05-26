@@ -8,6 +8,7 @@ export const createCommentSchema = Joi.object({
     "string.max": `"comment_text" cannot be longer than {#limit} characters.`,
     "any.required": `"comment_text" is required.`,
   }),
+  local_id: Joi.string().allow("").optional(),
 });
 
 export const getCommentsSchema = Joi.object({

@@ -1,24 +1,24 @@
 @baseUrl = http://localhost:3000/api
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0MSIsImlhdCI6MTc3OTYwMTk4NSwiZXhwIjoxNzgxMzI5OTg1fQ.52vn0pQtw7KiuHsS1Tiwuv0-_6ByQajv_75gHEycp0k
 
-# Login
+### Login
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "test@gmail.com",
+  "email": "test2@gmail.com",
   "password": "secret"
 }
 
-# Sign up
+### Sign up
 POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
   "name": "Test User",
   "username": "Tester",
-  "email": "test@gmail.com",
+  "email": "test2@gmail.com",
   "password": "secret",
+  "confirmPassword": "secret",
   "gender": "male",
   "age": 25
 }

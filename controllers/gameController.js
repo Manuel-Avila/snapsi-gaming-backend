@@ -55,6 +55,13 @@ export const createReview = async (req, res, next) => {
       description
     });
 
+    // The review object returned by the model doesn't exist, we must construct it or fetch it.
+    const newReview = await GameModel.getReviewByUserAndGame(user_id, game_id);
+
+    if (newReview) {
+      req.app.get("io").emit("new_review", { review: newReview, local_id: req.body.local_id });
+    }
+
     res.status(201).json({ message: "Review created successfully", reviewId });
   } catch (error) {
     next(error);
