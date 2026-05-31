@@ -4,7 +4,7 @@ export const getCommentsByPostId = async (limit, cursor, postId) => {
   let baseQuery = `
     SELECT
       c.id, c.comment_text, c.created_at,
-      JSON_OBJECT(
+      json_build_object(
         'id', u.id,
         'name', u.name,
         'username', u.username,
@@ -43,7 +43,7 @@ export const getCommentById = async (commentId) => {
   const query = `
     SELECT
       c.id, c.comment_text, c.created_at,
-      JSON_OBJECT(
+      json_build_object(
         'id', u.id,
         'name', u.name,
         'username', u.username,
@@ -69,10 +69,10 @@ export const getCommentById = async (commentId) => {
 export const createComment = async (comment) => {
   const { user_id, post_id, comment_text } = comment;
 
-  const [result] = await db.query(
-    "INSERT INTO comments (user_id, post_id, comment_text) VALUES (?, ?, ?)",
+  const [rows] = await db.query(
+    "INSERT INTO comments (user_id, post_id, comment_text) VALUES (?, ?, ?) RETURNING id",
     [user_id, post_id, comment_text]
   );
 
-  return result.insertId;
+  return rows[0].id;
 };

@@ -1,6 +1,6 @@
 @baseUrl = http://localhost:3000/api
 @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJUZXN0ZXIiLCJpYXQiOjE3Nzk3Njk2MjIsImV4cCI6MTc4MTQ5NzYyMn0.hJAEDXoCyQe2n8CzRhfsdtrGDYr1MvDP0snsd0J51S4
-@postId = 6
+@postId = 10
 
 ### Get all posts
 GET {{baseUrl}}/posts

@@ -3,25 +3,26 @@ import db from "../config/database.js";
 export const createReview = async (review) => {
   const { user_id, game_id, game_name, game_image, rating, description } = review;
 
-  const [result] = await db.query(
+  const [rows] = await db.query(
     `INSERT INTO game_reviews (user_id, game_id, game_name, game_image, rating, description)
      VALUES (?, ?, ?, ?, ?, ?)
-     ON DUPLICATE KEY UPDATE
-       rating = VALUES(rating),
-       description = VALUES(description),
-       game_image = VALUES(game_image),
-       game_name = VALUES(game_name)`,
+     ON CONFLICT (user_id, game_id) DO UPDATE SET
+       rating = EXCLUDED.rating,
+       description = EXCLUDED.description,
+       game_image = EXCLUDED.game_image,
+       game_name = EXCLUDED.game_name
+     RETURNING id`,
     [user_id, game_id, game_name, game_image, rating, description]
   );
 
-  return result.insertId || result.affectedRows;
+  return rows[0].id;
 };
 
 export const getReviewByUserAndGame = async (user_id, game_id) => {
   const [rows] = await db.query(
     `SELECT
       gr.id, gr.game_id, gr.game_name, gr.game_image, gr.rating, gr.description, gr.created_at,
-      JSON_OBJECT(
+      json_build_object(
         'id', u.id, 'name', u.name, 'username', u.username, 'profile_picture_url', u.profile_picture_url
       ) AS user
     FROM game_reviews gr
@@ -36,7 +37,7 @@ export const getUserReviews = async (username, limit, cursor) => {
   let baseQuery = `
     SELECT
       gr.id, gr.game_id, gr.game_name, gr.game_image, gr.rating, gr.description, gr.created_at,
-      JSON_OBJECT(
+      json_build_object(
         'id', u.id, 'name', u.name, 'username', u.username, 'profile_picture_url', u.profile_picture_url
       ) AS user
     FROM

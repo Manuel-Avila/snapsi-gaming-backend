@@ -17,14 +17,14 @@ services:
           target: /app
           action: sync
   db:
-    image: mysql:latest
+    image: postgres:15-alpine
     environment:
-     - MYSQL_ROOT_PASSWORD=secret
-     - MYSQL_DATABASE=snapsi
+     - POSTGRES_PASSWORD=secret
+     - POSTGRES_DB=snapsi
     ports:
-      - 3306:3306
+      - 5432:5432
     volumes:
-      - snapsi:/var/lib/mysql
+      - snapsi:/var/lib/postgresql/data
 
 volumes:
   snapsi:

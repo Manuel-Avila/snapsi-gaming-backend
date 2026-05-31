@@ -30,13 +30,13 @@ export const getUserForAuth = async (email) => {
 export const createUser = async (user) => {
   const { name, username, email, password, gender, age } = user;
 
-  const [result] = await db.query(
+  const [rows] = await db.query(
     `INSERT INTO users (name, username, email, password, gender, age)
-     VALUES (?, ?, ?, ?, ?, ?)`,
+     VALUES (?, ?, ?, ?, ?, ?) RETURNING id`,
     [name, username, email, password, gender, age]
   );
 
-  return result.insertId;
+  return rows[0].id;
 };
 
 export const updateUser = async (id, data) => {

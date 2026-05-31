@@ -5,7 +5,7 @@ import db from "../config/database.js";
 
 const statements = [
   `CREATE TABLE IF NOT EXISTS users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         username VARCHAR(50) NOT NULL UNIQUE,
         email VARCHAR(255) NOT NULL UNIQUE,
@@ -13,31 +13,31 @@ const statements = [
         bio TEXT,
         profile_picture_url VARCHAR(255),
         image_cloudinary_id VARCHAR(255),
-        gender ENUM('male', 'female', 'other'),
-        age TINYINT UNSIGNED,
+        gender VARCHAR(10) CHECK (gender IN ('male', 'female', 'other')),
+        age SMALLINT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );`,
   `CREATE TABLE IF NOT EXISTS posts (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         user_id INT NOT NULL,
         image_url TEXT NOT NULL,
         image_cloudinary_id VARCHAR(255),
         caption TEXT,
-        tags JSON,
+        tags JSONB,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );`,
   `CREATE TABLE IF NOT EXISTS stories (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         user_id INT NOT NULL,
         image_url TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );`,
   `CREATE TABLE IF NOT EXISTS comments (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         user_id INT NOT NULL,
         post_id INT NOT NULL,
         comment_text TEXT NOT NULL,
@@ -62,22 +62,22 @@ const statements = [
         FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
     );`,
   `CREATE TABLE IF NOT EXISTS game_reviews (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         user_id INT NOT NULL,
         game_id INT NOT NULL,
         game_name VARCHAR(255) NOT NULL,
         game_image TEXT,
-        rating TINYINT UNSIGNED NOT NULL CHECK (rating <= 100),
+        rating SMALLINT NOT NULL CHECK (rating <= 100),
         description TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE KEY unique_user_game (user_id, game_id),
+        UNIQUE (user_id, game_id),
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );`,
   `CREATE TABLE IF NOT EXISTS notifications (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         recipient_user_id INT NOT NULL, 
         sender_user_id INT NOT NULL, 
-        type ENUM('like', 'comment') NOT NULL,
+        type VARCHAR(10) NOT NULL CHECK (type IN ('like', 'comment')),
         post_id INT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (recipient_user_id) REFERENCES users(id) ON DELETE CASCADE,

@@ -8,14 +8,14 @@ export const getNotificationsByUserId = async (
   let baseQuery = `
     SELECT 
         n.id, n.type, n.created_at, 
-        JSON_OBJECT(
+        json_build_object(
             'id', u.id,
             'username', u.username,
             'profile_picture_url', u.profile_picture_url
         ) AS sender,
         CASE 
             WHEN n.post_id IS NOT NULL THEN
-                JSON_OBJECT(
+                json_build_object(
                     'id', p.id,
                     'image_url', p.image_url
                 )
@@ -56,31 +56,31 @@ export const createNotification = async (notification) => {
   const { type, sender_user_id, recipient_user_id, post_id } = notification;
 
   const query = `
-        INSERT INTO notifications (type, sender_user_id, recipient_user_id, post_id) VALUES (?, ?, ?, ?)
+        INSERT INTO notifications (type, sender_user_id, recipient_user_id, post_id) VALUES (?, ?, ?, ?) RETURNING id
     `;
 
-  const [result] = await db.query(query, [
+  const [rows] = await db.query(query, [
     type,
     sender_user_id,
     recipient_user_id,
     post_id || null,
   ]);
 
-  return result.insertId;
+  return rows[0].id;
 };
 
 export const getNotificationById = async (notificationId) => {
   const baseQuery = `
     SELECT 
         n.id, n.type, n.created_at, n.recipient_user_id,
-        JSON_OBJECT(
+        json_build_object(
             'id', u.id,
             'username', u.username,
             'profile_picture_url', u.profile_picture_url
         ) AS sender,
         CASE 
             WHEN n.post_id IS NOT NULL THEN
-                JSON_OBJECT(
+                json_build_object(
                     'id', p.id,
                     'image_url', p.image_url
                 )

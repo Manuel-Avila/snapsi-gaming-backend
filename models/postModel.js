@@ -11,7 +11,7 @@ const _getPostsBase = async (
     SELECT
       p.id, p.image_url, p.caption, p.created_at, p.image_cloudinary_id,
       p.tags,
-      JSON_OBJECT(
+      json_build_object(
         'id', u.id, 'name', u.name, 'username', u.username, 'profile_picture_url', u.profile_picture_url
       ) AS user,
       (SELECT COUNT(*) FROM post_likes WHERE post_id = p.id) AS like_count,
@@ -62,11 +62,11 @@ export const getPosts = async (limit, cursor, currentUserId, filters = {}) => {
 
   const conditions = [];
   if (filters.game_id) {
-    conditions.push("JSON_CONTAINS(p.tags, JSON_OBJECT('gameId', ?))");
+    conditions.push("p.tags @> json_build_object('gameId', ?::numeric)::jsonb");
     whereParams.push(Number(filters.game_id));
   }
   if (filters.category) {
-    conditions.push("JSON_CONTAINS(p.tags, JSON_OBJECT('category', ?))");
+    conditions.push("p.tags @> json_build_object('category', ?::text)::jsonb");
     whereParams.push(filters.category);
   }
 
@@ -100,7 +100,7 @@ export const getPostById = async (postId, currentUserId) => {
     SELECT
       p.id, p.image_url, p.caption, p.created_at, p.image_cloudinary_id,
       p.tags,
-      JSON_OBJECT(
+      json_build_object(
         'id', u.id, 'name', u.name, 'username', u.username, 'profile_picture_url', u.profile_picture_url
       ) AS user,
       (SELECT COUNT(*) FROM post_likes WHERE post_id = p.id) AS like_count,
@@ -133,13 +133,13 @@ export const getPostById = async (postId, currentUserId) => {
 export const createPost = async (post) => {
   const { user_id, caption, image_url, image_cloudinary_id, tags } = post;
 
-  const [result] = await db.query(
+  const [rows] = await db.query(
     `INSERT INTO posts (user_id, caption, image_url, image_cloudinary_id, tags)
-        VALUES (?, ?, ?, ?, ?)`,
+        VALUES (?, ?, ?, ?, ?) RETURNING id`,
     [user_id, caption, image_url, image_cloudinary_id, tags || null]
   );
 
-  return result.insertId;
+  return rows[0].id;
 };
 
 export const deletePost = async (postId, userId) => {

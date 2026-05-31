@@ -11,11 +11,9 @@ import db from "../config/database.js";
 
   try {
     connection = await db.getConnection();
-    const dbName = connection.config.database;
 
     const [rows] = await connection.query(
-      `SELECT table_name FROM information_schema.tables WHERE table_schema = ?`,
-      [dbName]
+      `SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`
     );
 
     if (rows.length === 0) {
@@ -23,11 +21,9 @@ import db from "../config/database.js";
       process.exit(0);
     }
 
-    const tableNames = rows.map((row) => `\`${row.TABLE_NAME}\``).join(", ");
+    const tableNames = rows.map((row) => `"${row.table_name}"`).join(", ");
 
-    await connection.query("SET FOREIGN_KEY_CHECKS = 0;");
-    await connection.query(`DROP TABLE IF EXISTS ${tableNames};`);
-    await connection.query("SET FOREIGN_KEY_CHECKS = 1;");
+    await connection.query(`DROP TABLE IF EXISTS ${tableNames} CASCADE;`);
 
     console.log("✅ Database drop completed successfully.");
   } catch (err) {
