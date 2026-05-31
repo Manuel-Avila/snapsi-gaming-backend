@@ -24,6 +24,9 @@ if (process.env.NODE_ENV === "production") {
 const pool = new pg.Pool({
   ...dbConfig,
   max: 10,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 // Helper to convert MySQL '?' placeholders to PostgreSQL '$1, $2' format

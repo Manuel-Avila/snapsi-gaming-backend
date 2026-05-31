@@ -1,7 +1,5 @@
 services:
   api:
-    depends_on:
-      - db
     build: .
     ports: 
       - 3000:3000
@@ -16,15 +14,34 @@ services:
         - path: .
           target: /app
           action: sync
-  db:
-    image: postgres:15-alpine
-    environment:
-     - POSTGRES_PASSWORD=secret
-     - POSTGRES_DB=snapsi
-    ports:
-      - 5432:5432
-    volumes:
-      - snapsi:/var/lib/postgresql/data
 
-volumes:
-  snapsi:
+# services:
+#   api:
+#     depends_on:
+#       - db
+#     build: .
+#     ports: 
+#       - 3000:3000
+#     env_file:
+#       - .env
+#     develop:
+#       watch:
+#         - path: ./package.json
+#           action: rebuild
+#         - path: ./package-lock.json
+#           action: rebuild
+#         - path: .
+#           target: /app
+#           action: sync
+#   db:
+#     image: postgres:15-alpine
+#     environment:
+#      - POSTGRES_PASSWORD=secret
+#      - POSTGRES_DB=snapsi
+#     ports:
+#       - 5432:5432
+#     volumes:
+#       - snapsi:/var/lib/postgresql/data
+
+# volumes:
+#   snapsi:
